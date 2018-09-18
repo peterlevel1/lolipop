@@ -1,13 +1,11 @@
 'use strict';
 
+const setDefaultConfig = require('./_config.default');
+
 module.exports = appInfo => {
   const config = exports = {};
 
-  // use for cookie sign key, should change to your own and keep security
-  config.keys = appInfo.name + '_1537234294332_6925';
-
-  // add your config here
-  config.middleware = [];
+  setDefaultConfig(appInfo, config);
 
   return config;
 };
