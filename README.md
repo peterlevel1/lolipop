@@ -1,6 +1,6 @@
 # lolipop
-
 a nodejs server
+
 
 ## QuickStart
 
@@ -31,3 +31,6 @@ $ npm stop
 
 
 [egg]: https://eggjs.org
+=======
+a nodejs server
+>>>>>>> e89d672397f23d69f614b4ef554947624e0959d6
