@@ -1,5 +1,7 @@
 module.exports = (appInfo, config) => {
 
+  const csrfIgnoreUrls = ['POST /res/u/login'];
+
   const ret = {
     keys: 'love internet, search anything, so, what do u say ? haha',
 
@@ -15,6 +17,19 @@ module.exports = (appInfo, config) => {
       ],
 
       whilelist: []
+    },
+
+    security: {
+      csrf: {
+        ignore: (ctx) => {
+          const { method, url } = ctx.request;
+          const str = method + ' ' + url;
+
+          if (csrfIgnoreUrls.includes(str)) {
+            return true;
+          }
+        }
+      }
     },
 
     session: {

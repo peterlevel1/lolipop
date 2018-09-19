@@ -1,5 +1,6 @@
 const Controller = require('egg').Controller;
 const debug = require('debug')('controller:user');
+const utils = require('../../lib/utils');
 const { rules, table, PASSWORD_LENGTH, DAY } = require('../../config/controller/user');
 
 class UserController extends Controller {
@@ -67,7 +68,7 @@ class UserController extends Controller {
     // 2. compare captcha
 
     // 3. find the user
-    const user = await this.service.common.find(table, { username: body.username });
+    const user = await this.service.common.findOne(table, { username: body.username });
     if (!user) {
       this.ctx.body = { success: false, message: 'no user' };
       return;
@@ -97,7 +98,8 @@ class UserController extends Controller {
         nickname: user.nickname,
         intro: user.intro,
         avatar: user.avatar
-      }
+      },
+      message: '登录成功'
     };
   }
 

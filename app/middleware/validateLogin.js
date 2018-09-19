@@ -5,29 +5,27 @@ module.exports = (options = {}) => {
     return new RegExp(`^${url}`);
   });
 
+  function needsLogin(url) {
+    return required.some(reg => reg.test(url));
+  }
+
   return async function validateLogin(ctx, next) {
     // TODO: 对来源验证
     const url = ctx.req.url;
-    // console.log('url', url);
 
-    if (ctx.session.uid) {
+    if (ctx.session.uid || options.whilelist.includes(url)) {
       await next();
       return;
     }
 
-    if (options.whilelist.includes(url)) {
-      await next();
-      return;
-    }
-
-    const needsLogin = required.some(reg => reg.test(url));
-    if (needsLogin && !ctx.session.uid) {
+    if (needsLogin(url) && !ctx.session.uid) {
       ctx.body = {
         success: false,
-        redirectUrl: `${options.target}?redirectUrl=${encodeURIComponent(ctx.request.href)}`,
+        needsLogin: true,
+        // TODO: 公用的登陆路径
+        // redirectUrl: `${options.target}?redirectUrl=${encodeURIComponent(ctx.request.href)}`,
         message: '您还尚未登录'
       };
-      // ctx.redirect();
       return;
     }
 
