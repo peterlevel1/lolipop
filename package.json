@@ -24,11 +24,10 @@
     "node": ">=8.9.0"
   },
   "scripts": {
-    "set-debug-env": "DEBUG=app,extend:*,view,util,api:*,controller:*,service:*,middleware:*",
     "start": "egg-scripts start --daemon --title=egg-server-lolipop",
     "stop": "egg-scripts stop --title=egg-server-lolipop",
-    "dev": "egg-bin dev --port=3000",
-    "debug": "egg-bin debug",
+    "dev": "DEBUG=app:* egg-bin dev --port=3000",
+    "debug": "egg-bin debug --port=3000",
     "test": "npm run lint -- --fix && npm run test-local",
     "test-local": "egg-bin test",
     "cov": "egg-bin cov",

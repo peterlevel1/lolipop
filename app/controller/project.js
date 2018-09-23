@@ -1,6 +1,6 @@
 const Controller = require('egg').Controller;
-const debug = require('debug')('controller:project');
-const { table } = require('../../config/controller/project');
+const debug = require('debug')('app:controller:project');
+const { table } = require('../lib/controller/project');
 
 class ProjectController extends Controller {
   async index() {

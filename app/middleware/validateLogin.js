@@ -1,34 +1,36 @@
-const debug = require('debug')('middleware:validateLogin');
+const debug = require('debug')('app:middleware:validateLogin');
+const { getClientSource } = require('../lib/utils');
 
 module.exports = (options = {}) => {
-  const required = options.required.map(url => {
+  const requiredArr = options.urls.map(url => {
     return new RegExp(`^${url}`);
   });
 
   function needsLogin(url) {
-    return required.some(reg => reg.test(url));
+    return requiredArr.some(reg => reg.test(url));
   }
 
   return async function validateLogin(ctx, next) {
-    // TODO: 对来源验证
-    const url = ctx.req.url;
+    const user = ctx.session.user;
 
-    if (ctx.session.uid || options.whilelist.includes(url)) {
+    if (user) {
+      // hacker may take advantage of the user cookie
+      if (getClientSource(ctx) !== user.lastLoginInfo) {
+        ctx.body = { success: false, needsLogin: true, message: '重新登录' };
+        return;
+      }
+
       await next();
       return;
     }
 
-    if (needsLogin(url) && !ctx.session.uid) {
-      ctx.body = {
-        success: false,
-        needsLogin: true,
-        // TODO: 公用的登陆路径
-        // redirectUrl: `${options.target}?redirectUrl=${encodeURIComponent(ctx.request.href)}`,
-        message: '您还尚未登录'
-      };
+    const url = ctx.request.url;
+
+    if (options.whilelist.includes(url) || !needsLogin(url)) {
+      await next();
       return;
     }
 
-    await next();
+    ctx.body = { success: false, needsLogin: true, message: '尚未登录' };
   };
 };

@@ -1,4 +1,5 @@
 const Service = require('egg').Service;
+const debug = require('debug')('app:service:common');
 
 class CommonService extends Service {
   async create(table, condition) {
@@ -9,8 +10,8 @@ class CommonService extends Service {
     return await this.app.mysql.get(table, condition);
   }
 
-  async find(table, condition) {
-    return await this.app.mysql.select(table, condition);
+  async find(table, where) {
+    return await this.app.mysql.select(table, { where });
   }
 
   async update(table, condition) {

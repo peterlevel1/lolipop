@@ -1,27 +1,14 @@
-const debug = require('debug');
-const configDebug = require('./config/debug');
+const debug = require('debug')('app:core');
+const Controller = require('egg').Controller;
 
-debug.enable(configDebug);
+const extendController = require('./lib/extend/controller');
+const extendValidator = require('./lib/extend/validator');
 
 module.exports = app => {
-  const appDebug = debug('app');
-
-  // used for view render work
-  const isProd = app.config.env === 'prod';
-  app.locals = {
-    isProd,
-    feHost: isProd ? '' : 'http://localhost:3003',
-  };
-
-  // appDebug('app.config %o', app.config);
   app.beforeStart(async () => {
-    appDebug('app start');
+    debug('app start');
   });
 
-  // validate the parameters
-  const Parameter = app.validator.constructor;
-
-  app.validator.addRule('@int', function (rule, value) {
-    return Parameter.TYPE_MAP.int.call(this, rule, value - 0);
-  });
+  extendController(Controller);
+  extendValidator(app.validator);
 }

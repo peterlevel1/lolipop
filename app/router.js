@@ -6,15 +6,17 @@
 module.exports = app => {
   const { router, controller } = app;
 
-  router.resources('user', '/api/user', app.controller.user);
-  router.resources('project', '/api/project', app.controller.project);
-  router.resources('docNode', '/api/docNode', app.controller.project);
+  router.get('/', 'home.index');
+  router.get('/a/b', 'a.b.index');
 
-  router.get('/api/docNode/:id/children', 'docNode.showChildren');
+  // login/logout logic
+  router.get('/res/user/info', 'user.info');
+  router.post('/res/user/login', 'user.login');
+  router.get('/res/user/logout', 'user.logout');
 
-  router.get('/', controller.home.index);
-
-  router.get('/res/u/info', 'user.info');
-  router.post('/res/u/login', 'user.login');
-  router.get('/res/u/logout', 'user.logout');
+  // api
+  router.resources('/api/user', 'user');
+  router.resources('/api/project', 'project');
+  router.resources('/api/docFolder', 'docFolder');
+  router.resources('/api/docNode', 'docNode');
 };

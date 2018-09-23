@@ -1,16 +1,11 @@
 const Controller = require('egg').Controller;
-const debug = require('debug')('controller:user');
-const utils = require('../../lib/utils');
-const { rules, table, PASSWORD_LENGTH, DAY } = require('../../config/controller/user');
+const debug = require('debug')('app:controller:user');
+const { rules, table, encryptPassword } = require('../lib/controller/user');
+const { getClientSource } = require('../lib/utils');
 
 class UserController extends Controller {
   // user register
   async create() {
-    if (!this.session) {
-      this.ctx.body = { success: false, message: 'where are you ?' };
-      return;
-    }
-
     const ctx = this.ctx;
     const body = ctx.request.body;
 
@@ -31,7 +26,7 @@ class UserController extends Controller {
     }
 
     // 3. encrypt password
-    body.password = util.encryptPassword(body.password);
+    body.password = encryptPassword(body.password);
 
     await this.service.user.create(body);
 
@@ -39,74 +34,59 @@ class UserController extends Controller {
     ctx.status = 201;
   }
 
-  addUserSession(user, rememberme) {
-    this.ctx.session.uid = user.id;
-    this.ctx.session.isLogin = true;
-
-    // TODO: 设置 maxAge, session的_expire会被自动设置
-    if (this.ctx.request.body.rememberme) {
-      this.ctx.session.maxAge = 7 * DAY;
-    } else {
-      this.ctx.session.maxAge = DAY;
-    }
-  }
-
-  delUserSession() {
-    this.ctx.session.uid = null;
-    this.ctx.session.isLogin = false;
-    // TODO: 一旦设置为-1，就什么东西都存不住了
-    // this.ctx.session.maxAge = -1;
-  }
-
   // TODO: 暂时不检查 captcha
   async login() {
-    const body = this.ctx.request.body;
+    const ctx = this.ctx;
+    const { request, service, session } = ctx;
+    const body = request.body;
 
-    // 1. validate body
-    this.ctx.validate(rules.login, body);
+    // 1. test whether the user has been logined or not
+    if (session.user) {
+      ctx.body = { success: false, message: '先退出，再登陆' };
+      return;
+    }
 
     // 2. compare captcha
 
     // 3. find the user
-    const user = await this.service.common.findOne(table, { username: body.username });
+    let user = await service.common.findOne(table, { username: body.username });
     if (!user) {
-      this.ctx.body = { success: false, message: 'no user' };
+      ctx.body = { success: false, message: 'no user' };
       return;
     }
 
     // 4. compare password
-    const passwordEncrypted = utils.encrypt(body.password, PASSWORD_LENGTH);
+    const passwordEncrypted = encryptPassword(body.password);
     if (passwordEncrypted !== user.password) {
-      this.ctx.body = { success: false, message: 'password is wrong' };
+      ctx.body = { success: false, message: 'password is wrong' };
       return;
     }
 
-    // 5. set user data on the session
-    this.addUserSession(user, body.rememberme);
-
-    const redirectUrl = this.ctx.request.query.redirectUrl;
-    if (redirectUrl) {
-      this.ctx.redirect(decodeURIComponent(redirectUrl));
-      return;
+    // 5. ensure the current user is the only user
+    const prevSessionStoreUser = await service.user.findUserInSession(user.username);
+    if (prevSessionStoreUser) {
+      await service.user.delUserInSession(user.username);
     }
 
-    this.ctx.body = {
-      success: true,
-      data: {
-        id: user.id,
-        username: user.username,
-        nickname: user.nickname,
-        intro: user.intro,
-        avatar: user.avatar
-      },
-      message: '登录成功'
-    };
+    // 6. handle user lastLoginInfo
+    const loginInfo = getClientSource(ctx);
+    if (!user.lastLoginInfo || user.lastLoginInfo !== loginInfo) {
+      await service.common.update(table, { id: user.id, lastLoginInfo: loginInfo });
+
+      user = await service.common.findOne(table, { username: body.username });
+    }
+
+    // 7. set user data on the session
+    service.user.addUserSession(user, body.rememberme);
+
+    ctx.body = { success: true, data: { csrfToken: ctx.csrf }, message: '登录成功' };
   }
 
-  async info(next) {
-    const user = await this.service.common.find(table, {
-      id: this.ctx.session.uid
-    });
+  /**
+   * 用户自动获取数据库的信息
+   */
+  async info() {
+    const user = this.ctx.session.user;
 
     this.ctx.body = {
       success: true,
@@ -121,9 +101,9 @@ class UserController extends Controller {
   }
 
   async logout() {
-    this.delUserSession();
+    this.service.user.delUserSession();
 
-    this.ctx.body = { success: true };
+    this.ctx.body = { success: true, message: '登出成功' };
   }
 }
 

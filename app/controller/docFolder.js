@@ -1,8 +1,8 @@
 const Controller = require('egg').Controller;
-const debug = require('debug')('app:controller:docNode');
-const { table } = require('../lib/controller/docNode');
+const debug = require('debug')('app:controller:docFolder');
+const { table } = require('../lib/controller/docFolder');
 
-class DocNodeController extends Controller {
+class DocFolderController extends Controller {
   async create() {
     const body = this.ctx.request.body;
 
@@ -28,4 +28,4 @@ class DocNodeController extends Controller {
   }
 }
 
-module.exports = DocNodeController;
+module.exports = DocFolderController;

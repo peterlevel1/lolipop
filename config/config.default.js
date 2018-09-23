@@ -9,3 +9,11 @@ module.exports = appInfo => {
 
   return config;
 };
+
+/*
+module.exports = appInfo => {
+  const config = exports = {};
+
+  return config;
+};
+*/

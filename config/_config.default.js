@@ -1,16 +1,13 @@
 module.exports = (appInfo, config) => {
-
-  const csrfIgnoreUrls = ['POST /res/u/login'];
-
   const ret = {
     keys: 'love internet, search anything, so, what do u say ? haha',
 
     middleware: ['logRequest', 'validateLogin', 'errorHandler'],
 
     validateLogin: {
-      target: 'http://localhost:3003/login',
+      // target: 'http://localhost:3003/login',
 
-      required: [
+      urls: [
         '/res/u/info',
         '/res/u/logout',
         '/api',
@@ -21,13 +18,12 @@ module.exports = (appInfo, config) => {
 
     security: {
       csrf: {
+        useSession: true,
+        sessionName: 'csrfToken',
         ignore: (ctx) => {
           const { method, url } = ctx.request;
-          const str = method + ' ' + url;
 
-          if (csrfIgnoreUrls.includes(str)) {
-            return true;
-          }
+          return `${method} ${url}` === 'POST /res/u/login';
         }
       }
     },
