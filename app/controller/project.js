@@ -4,6 +4,7 @@ const { table } = require('../lib/controller/project');
 
 class ProjectController extends Controller {
   async index() {
+    debug('candy %o', this.ctx.request.candy);
     const data = await this.service.common.find(table, { uid: this.ctx.session.uid });
 
     this.ctx.body = {
@@ -16,6 +17,7 @@ class ProjectController extends Controller {
   }
 
   async show() {
+    debug('candy %o', this.ctx.request.candy);
     const data = await this.service.common.findOne(table, { id: this.ctx.params.id });
 
     this.ctx.body = { success: true, data };

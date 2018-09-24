@@ -76,6 +76,7 @@ class UserController extends Controller {
       user = await service.common.findOne(table, { username: body.username });
     }
 
+    debug('user controller, csrf: before rotate %s', this.ctx.csrf);
     // 7. set user data on the session
     service.user.addUserSession(user, body.rememberme);
 
@@ -86,7 +87,9 @@ class UserController extends Controller {
    * 用户自动获取数据库的信息
    */
   async info() {
+    debug('user info');
     const user = this.ctx.session.user;
+    debug('candy %o', this.ctx.request.candy);
 
     this.ctx.body = {
       success: true,

@@ -12,6 +12,7 @@ class DocFolderController extends Controller {
   }
 
   async index() {
+    debug('candy %o', this.ctx.request.candy);
     const { query } = this.ctx;
 
     const data = await this.service.common.find(table, query);

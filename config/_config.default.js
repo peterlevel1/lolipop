@@ -2,7 +2,11 @@ module.exports = (appInfo, config) => {
   const ret = {
     keys: 'love internet, search anything, so, what do u say ? haha',
 
-    middleware: ['logRequest', 'validateLogin', 'errorHandler'],
+    middleware: [ 'allowedMethods', 'logRequest', 'validateLogin', 'errorHandler' ],
+
+    allowedMethods: {
+      methods: [ 'GET', 'POST', 'PUT', 'DELETE' ]
+    },
 
     validateLogin: {
       // target: 'http://localhost:3003/login',
@@ -20,10 +24,11 @@ module.exports = (appInfo, config) => {
       csrf: {
         useSession: true,
         sessionName: 'csrfToken',
+        headerName: 'X-CSRF-Token',
         ignore: (ctx) => {
           const { method, url } = ctx.request;
 
-          return `${method} ${url}` === 'POST /res/u/login';
+          return `${method} ${url}` === 'POST /res/user/login';
         }
       }
     },

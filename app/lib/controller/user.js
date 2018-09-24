@@ -4,9 +4,6 @@ const PASSWORD_LENGTH = 20;
 
 exports.table = 'lolipop_user';
 
-exports.url = '/api/user';
-exports.url2 = '/res/u';
-
 exports.validate = function() {
 
 }
