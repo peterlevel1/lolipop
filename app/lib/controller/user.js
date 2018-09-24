@@ -1,12 +1,6 @@
 const { encrypt } = require('../utils');
 
-const PASSWORD_LENGTH = 20;
-
 exports.table = 'lolipop_user';
-
-exports.validate = function() {
-
-}
 
 exports.rules = {
   login: {
@@ -16,7 +10,9 @@ exports.rules = {
     },
     password: {
       type: 'password',
-      required: true
+      required: true,
+      min: 6,
+      max: 20
     },
   },
 
@@ -47,6 +43,8 @@ exports.rules = {
     }
   }
 };
+
+const PASSWORD_LENGTH = 20;
 
 exports.encryptPassword = function(password) {
   return encrypt(password, PASSWORD_LENGTH);

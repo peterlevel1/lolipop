@@ -1,0 +1,1 @@
+exports.table = 'aaa';

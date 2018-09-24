@@ -1,11 +1,11 @@
 'use strict';
-
+const debug = require('debug')('app:controller:ab');
 const Controller = require('egg').Controller;
 
 class AbController extends Controller {
   async index() {
-    // console.log('this', this);
-    this.ctx.body = 'hi, ab';
+    debug('candy %o', this.ctx.request.candy);
+    this.ctx.body = { success: true, body: 'lalala' };
   }
 }
 

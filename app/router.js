@@ -9,13 +9,13 @@ module.exports = app => {
   const { router, controller } = app;
 
   router.get('/', 'home.index');
-  router.get('/a/b', 'a.b.index');
 
-  router.all('/*', async (ctx, next) => {
-    debug('all _matchedRoute /* :', ctx._matchedRoute);
-    debug('all _matchedRouteName /* :', ctx._matchedRouteName);
-    await next();
-  });
+  router.get('/res/a/b/index', 'a.b.index');
+  // router.all('/*', async (ctx, next) => {
+  //   debug('all _matchedRoute /* :', ctx._matchedRoute);
+  //   debug('all _matchedRouteName /* :', ctx._matchedRouteName);
+  //   await next();
+  // });
 
   // login/logout logic
   router.get(`/${ACTION_PREFIX}/user/info`, 'user.info');

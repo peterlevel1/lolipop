@@ -12,8 +12,8 @@ module.exports = (appInfo, config) => {
       // target: 'http://localhost:3003/login',
 
       urls: [
-        '/res/u/info',
-        '/res/u/logout',
+        '/res/user/info',
+        '/res/user/logout',
         '/api',
       ],
 

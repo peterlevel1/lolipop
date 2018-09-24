@@ -2,9 +2,34 @@ const debug = require('debug')('app:extend:request');
 const { ACTION_PREFIX, API_PREFIX } = require('../lib/constants');
 
 module.exports = {
+
+  get validatedData() {
+    const candy = this.candy;
+
+    if (!candy || !candy.store.rules) {
+      return;
+    }
+
+    const rule = candy.store.rules[candy.action];
+    if (!rule) {
+      // this.ctx.throw(500, 'no rule for action');
+      return;
+    }
+
+    const body = this.method === 'GET' ? this.query : this.body;
+    const data = Object.keys(rule).reduce((memo, key) => {
+      memo[key] = body[key];
+      return memo;
+    }, {});
+
+    this.ctx.validate(rule, data);
+
+    return data;
+  },
+
   get candy() {
     if (!this.ctx._matchedRoute) {
-      return null;
+      return;
     }
 
     const str = this.ctx._matchedRoute.replace(/^\//, '');
@@ -12,7 +37,7 @@ module.exports = {
     const prefix = arr.shift();
 
     if (![ API_PREFIX, ACTION_PREFIX ].includes(prefix)) {
-      return null;
+      return;
     }
 
     let store = this.app.controllerStore,
@@ -37,7 +62,8 @@ module.exports = {
     }
 
     if (!store) {
-      return null;
+      // this.ctx.throw(500, 'no matched controller store');
+      return;
     }
 
     let action;
@@ -66,7 +92,7 @@ module.exports = {
 
     return {
       store,
-      controller: key,
+      controller: arr.slice(0, i + 1).join('.'),
       action,
     };
   }
