@@ -6,6 +6,10 @@ const CANDY = Symbol('Request#candy');
 
 module.exports = {
 
+  get table() {
+    return this.candy && this.candy.store.table;
+  },
+
   get lolly() {
     if (this[LOLLY] !== undefined) {
       return this[LOLLY];

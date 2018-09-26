@@ -13,9 +13,9 @@ exports.rules = {
     parentId: 'int'
   },
   update: {
-    title: 'string?',
-    desc: 'string?',
-    parentId: 'int?'
+    title: 'string',
+    desc: 'string',
+    parentId: 'int'
   },
 }
 

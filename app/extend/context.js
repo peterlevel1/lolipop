@@ -7,5 +7,9 @@ module.exports = {
 
   get candy() {
     return this.request.candy;
+  },
+
+  get table() {
+    return this.request.table;
   }
 };
