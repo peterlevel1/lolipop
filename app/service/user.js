@@ -6,15 +6,10 @@ const { DAY } = require('../lib/constants');
 class UserService extends Service {
   addUserSession(user, rememberme) {
     const session = this.ctx.session;
-    debug('csrf: before rotate %s', this.ctx.csrf);
-    // update csrf token
-    this.ctx.rotateCsrfSecret();
-    debug('csrf: after rotate %s', this.ctx.csrf);
 
     // TODO: 设置 maxAge, session的_expire会被自动设置
     session.maxAge = rememberme ? 7 * DAY : DAY;
     session.user = user;
-    session.csrfToken = this.ctx.csrf;
   }
 
   delUserSession() {
@@ -23,7 +18,6 @@ class UserService extends Service {
     // TODO: 一旦设置为-1，就什么东西都存不住了
     session.maxAge = -1;
     session.user = null;
-    session.csrfToken = null;
   }
 
   async findUserInSession(username) {

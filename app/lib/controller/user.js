@@ -14,6 +14,7 @@ exports.rules = {
       min: 6,
       max: 20
     },
+    rememberme: 'int'
   },
 
   create: {

@@ -8,7 +8,7 @@ exports.encrypt = function encrypt(text, n) {
 }
 
 exports.getClientSource = function getClientSource(ctx) {
-  const ip = ctx.ips.length ? ctx.ips[0] : ctx.ip;
+  const ip = ctx.ip;
   const userAgent = ctx.get('User-Agent');
 
   return `${ip}${SEPARATOR}${userAgent}`;

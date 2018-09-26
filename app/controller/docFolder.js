@@ -4,19 +4,17 @@ const { table } = require('../lib/controller/docFolder');
 
 class DocFolderController extends Controller {
   async create() {
-    const body = this.ctx.request.body;
+    const lolly = this.ctx.lolly;
 
-    const data = await this.service.common.create(table, body);
+    const data = await this.service.common.create(table, lolly);
 
     this.ctx.body = { success: true, data };
   }
 
   async index() {
-    debug('candy %o', this.ctx.request.candy);
-    debug('validatedData %o', this.ctx.request.validatedData);
-    const { query } = this.ctx;
+    const lolly = this.ctx.request.lolly;
 
-    const data = await this.service.common.find(table, query);
+    const data = await this.service.common.find(table, lolly);
 
     this.ctx.body = { success: true, data };
   }

@@ -7,7 +7,7 @@ class UserController extends Controller {
   // user register
   async create() {
     const ctx = this.ctx;
-    const body = ctx.request.body;
+    const candy = ctx.request.candy;
 
     ctx.validate(rules.create, body);
 
@@ -37,26 +37,26 @@ class UserController extends Controller {
   // TODO: 暂时不检查 captcha
   async login() {
     const ctx = this.ctx;
-    const { request, service, session } = ctx;
-    const body = request.body;
 
     // 1. test whether the user has been logined or not
-    if (session.user) {
+    if (ctx.session.user) {
       ctx.body = { success: false, message: '先退出，再登陆' };
       return;
     }
 
+    const { lolly, service } = ctx;
+
     // 2. compare captcha
 
     // 3. find the user
-    let user = await service.common.findOne(table, { username: body.username });
+    let user = await service.common.findOne(table, { username: lolly.username });
     if (!user) {
       ctx.body = { success: false, message: 'no user' };
       return;
     }
 
     // 4. compare password
-    const passwordEncrypted = encryptPassword(body.password);
+    const passwordEncrypted = encryptPassword(lolly.password);
     if (passwordEncrypted !== user.password) {
       ctx.body = { success: false, message: 'password is wrong' };
       return;
@@ -73,23 +73,21 @@ class UserController extends Controller {
     if (!user.lastLoginInfo || user.lastLoginInfo !== loginInfo) {
       await service.common.update(table, { id: user.id, lastLoginInfo: loginInfo });
 
-      user = await service.common.findOne(table, { username: body.username });
+      user = await service.common.findOne(table, { username: lolly.username });
     }
 
-    debug('user controller, csrf: before rotate %s', this.ctx.csrf);
     // 7. set user data on the session
-    service.user.addUserSession(user, body.rememberme);
+    service.user.addUserSession(user, lolly.rememberme);
 
-    ctx.body = { success: true, data: { csrfToken: ctx.csrf }, message: '登录成功' };
+    // ctx.body = { success: true, data: { csrfToken: ctx.csrf }, message: '登录成功' };
+    ctx.body = { success: true, message: '登录成功' };
   }
 
   /**
    * 用户自动获取数据库的信息
    */
   async info() {
-    debug('user info');
     const user = this.ctx.session.user;
-    debug('candy %o', this.ctx.request.candy);
 
     this.ctx.body = {
       success: true,

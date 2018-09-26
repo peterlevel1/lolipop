@@ -1,34 +1,51 @@
 const debug = require('debug')('app:extend:request');
 const { ACTION_PREFIX, API_PREFIX } = require('../lib/constants');
 
+const LOLLY = Symbol('Request#lolly');
+const CANDY = Symbol('Request#candy');
+
 module.exports = {
 
-  get validatedData() {
+  get lolly() {
+    if (this[LOLLY] !== undefined) {
+      return this[LOLLY];
+    }
+
     const candy = this.candy;
 
     if (!candy || !candy.store.rules) {
+      this[LOLLY] = null;
       return;
     }
 
     const rule = candy.store.rules[candy.action];
     if (!rule) {
-      // this.ctx.throw(500, 'no rule for action');
+      this[LOLLY] = null;
       return;
     }
 
     const body = this.method === 'GET' ? this.query : this.body;
     const data = Object.keys(rule).reduce((memo, key) => {
-      memo[key] = body[key];
+      if (body[key] !== undefined) {
+        memo[key] = body[key];
+      }
       return memo;
     }, {});
 
     this.ctx.validate(rule, data);
 
-    return data;
+    this[LOLLY] = Object.keys(data).length > 0 ? data : null;
+
+    return this[LOLLY];
   },
 
   get candy() {
+    if (this[CANDY] !== undefined) {
+      return this[CANDY];
+    }
+
     if (!this.ctx._matchedRoute) {
+      this[CANDY] = null;
       return;
     }
 
@@ -37,6 +54,7 @@ module.exports = {
     const prefix = arr.shift();
 
     if (![ API_PREFIX, ACTION_PREFIX ].includes(prefix)) {
+      this[CANDY] = null;
       return;
     }
 
@@ -50,7 +68,6 @@ module.exports = {
       key = arr[i];
 
       if (!store[key] || typeof store[key] !== 'object') {
-        // TODO: throw new Error('no store for controller');
         store = null;
         break;
       }
@@ -62,7 +79,7 @@ module.exports = {
     }
 
     if (!store) {
-      // this.ctx.throw(500, 'no matched controller store');
+      this[CANDY] = null;
       return;
     }
 
@@ -90,10 +107,12 @@ module.exports = {
       action = arr[lastIndex];
     }
 
-    return {
+    this[CANDY] = {
       store,
       controller: arr.slice(0, i + 1).join('.'),
       action,
     };
+
+    return this[CANDY];
   }
 };

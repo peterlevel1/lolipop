@@ -22,14 +22,8 @@ module.exports = (appInfo, config) => {
 
     security: {
       csrf: {
-        useSession: true,
-        sessionName: 'csrfToken',
-        headerName: 'X-CSRF-Token',
-        ignore: (ctx) => {
-          const { method, url } = ctx.request;
-
-          return `${method} ${url}` === 'POST /res/user/login';
-        }
+        enable: false,
+        match: '/api'
       }
     },
 
