@@ -2,7 +2,10 @@ module.exports = {
   async index(ctx) {
     const query = ctx.query;
 
-    const data = await ctx.service.common.find(ctx.table, query);
+    const data = await ctx.service.common.find(ctx.table, {
+      ...query,
+      status: 1
+    });
 
     ctx.body = { success: true, data };
   },
@@ -10,7 +13,7 @@ module.exports = {
   async show(ctx) {
     const id = ctx.params.id;
 
-    const data = await ctx.service.common.find(ctx.table, { id });
+    const data = await ctx.service.common.find(ctx.table, { id, status: 1 });
 
     ctx.body = { success: true, data };
   },
@@ -21,7 +24,7 @@ module.exports = {
     const data = await ctx.service.common.create(ctx.table, body);
 
     // 需要返回数据库中真实的 id
-    ctx.body = { success: true, data };
+    ctx.body = { success: true, data: { id: data.insertId } };
   },
 
   async update(ctx) {
@@ -37,7 +40,7 @@ module.exports = {
   async destroy(ctx) {
     const id = ctx.params.id;
 
-    await ctx.service.common.del(ctx.table, { id });
+    await ctx.service.common.update(ctx.table, { id, status: 0 });
 
     ctx.status = 204;
   }

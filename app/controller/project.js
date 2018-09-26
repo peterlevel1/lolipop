@@ -13,7 +13,8 @@ class ProjectController extends Controller {
 
   async index() {
     const data = await this.service.common.find(table, {
-      uid: this.ctx.session.user.id
+      uid: this.ctx.session.user.id,
+      status: 1
     });
 
     this.ctx.body = { success: true, data };
@@ -21,7 +22,8 @@ class ProjectController extends Controller {
 
   async show() {
     const data = await this.service.common.findOne(table, {
-      id: this.ctx.params.id
+      id: this.ctx.params.id,
+      status: 1
     });
 
     this.ctx.body = { success: true, data };
@@ -33,7 +35,7 @@ class ProjectController extends Controller {
 
     const data = await this.service.common.update(table, {
       id,
-      ...body
+      ...body,
     });
 
     this.ctx.body = { success: true };
@@ -42,7 +44,7 @@ class ProjectController extends Controller {
   async destroy() {
     const id = this.ctx.params.id;
 
-    await this.service.common.del(table, { id });
+    await this.service.common.update(table, { id, status: 0 });
 
     this.ctx.body = { success: true };
   }
